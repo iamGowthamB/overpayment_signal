@@ -35,9 +35,9 @@ All 8 notebooks were executed sequentially from a fresh clone inside an isolated
 ## 3. Governance Adaptation Validation (Surprise Challenge)
 
 *   **Dampening Strategy**: A 60% bounded administrative dampening cap was applied to administrative-only cases (no post-closure payments, no same-month duplicates, and excess payments <= $200 empirical threshold).
-*   **Case C-33248 Demotion**: Demoted from rank **485** to **1,097** (adjusted score: `0.200595`), successfully resolving the administrative false positive.
+*   **Case C-33248 Demotion**: Demoted from rank **485** to **1,097** (adjusted score: `0.200595`), reducing its priority after investigator feedback identified its dominant signals as administrative/process activity.
 *   **Financial Anomaly Preservation**: Verified that no genuine financial anomaly cases were removed. High-risk overpayment cases (`C-34196`, `C-33728`, and `C-30954`) successfully entered the Top 20.
-*   **Fairness Improvement**: Neutralizing the contact attempts bias dropped non-English preferred language representation in the Top 100 from 32% to 26%.
+*   **Fairness Observation**: Non-English preferred-language representation in the Top 100 changed from 32% to 26% after the governance adjustment.
 
 ---
 

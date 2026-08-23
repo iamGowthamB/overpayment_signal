@@ -18,14 +18,26 @@ The goal is to prioritize benefit-payment cases for administrative review and in
 
 ```text
 Raw Cases + Payments
-→ Data Understanding
-→ EDA
-→ Feature Engineering
-→ Isolation Forest
-→ Priority Score
-→ Top-20 Ranking
-→ Explainability
-→ Fairness Analysis
+        ↓
+Data Understanding
+        ↓
+EDA
+        ↓
+Feature Engineering
+        ↓
+Isolation Forest
+        ↓
+Priority Score
+        ↓
+Top-20 Ranking
+        ↓
+Explainability
+        ↓
+Fairness Analysis
+        ↓
+Governance Adaptation
+        ↓
+Final Governed Ranking
 ```
 
 An unsupervised **Isolation Forest** algorithm is used to rank cases because the dataset has no explicit ground-truth labels. The model is trained on non-demographic aggregated metrics. The raw decision scores are inverted and normalized to a `[0, 1]` priority score.
@@ -57,7 +69,7 @@ overpayment_signal/
 
 ### 2. Clone and Enter Repository
 ```bash
-git clone <repository-url>
+git clone https://github.com/iamGowthamB/overpayment_signal.git
 cd overpayment_signal
 ```
 
