@@ -55,8 +55,14 @@ overpayment_signal/
 * Python 3.10+
 * Virtual environment tool (`venv`)
 
-### 2. Environment Configuration
-From the repository root directory:
+### 2. Clone and Enter Repository
+```bash
+git clone <repository-url>
+cd overpayment_signal
+```
+
+### 3. Environment Configuration
+Create and activate the virtual environment:
 
 ```bash
 # Create virtual environment
@@ -69,7 +75,7 @@ venv\Scripts\activate
 source venv/bin/activate
 ```
 
-### 3. Dependency Installation
+### 4. Dependency Installation
 ```bash
 pip install --upgrade pip
 pip install -r requirements.txt
