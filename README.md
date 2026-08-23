@@ -39,7 +39,7 @@ overpayment_signal/
 ├── data/
 │   ├── raw/                 # Input cases.csv and payments.csv
 │   └── processed/           # Processed features, rankings, and reports
-├── notebooks/               # Executable pipeline notebooks (01 to 07)
+├── notebooks/               # Executable pipeline notebooks (01 to 08)
 ├── src/                     # Reusable Python helper modules
 ├── requirements.txt         # Core dependencies list
 ├── DECISIONS.md             # Key design and architecture decisions
@@ -88,6 +88,7 @@ Notebooks must be run sequentially in the following order:
 5. **`05_risk_scoring.ipynb`**: Ranks the worklist and generates the Top 20 cases.
 6. **`06_explainability.ipynb`**: Compiles plain-language explanations for the prioritized cases.
 7. **`07_fairness_analysis.ipynb`**: Audits representation ratios and score parity across demographics.
+8. **`08_governance_adaptation.ipynb`**: Applies post-hoc governance score adjustments to produce the final governed rankings, explanations, and fairness reports.
 
 ### Execution Commands
 To execute the notebook pipeline from the repository root:
@@ -99,6 +100,7 @@ python -m nbconvert --to notebook --execute --inplace notebooks/04_model_trainin
 python -m nbconvert --to notebook --execute --inplace notebooks/05_risk_scoring.ipynb
 python -m nbconvert --to notebook --execute --inplace notebooks/06_explainability.ipynb
 python -m nbconvert --to notebook --execute --inplace notebooks/07_fairness_analysis.ipynb
+python -m nbconvert --to notebook --execute --inplace notebooks/08_governance_adaptation.ipynb
 ```
 
 ---
@@ -113,3 +115,8 @@ After executing the pipeline, the following processed outputs are generated and 
 * **`data/processed/top20_cases.csv`**: Top 20 prioritized cases worklist.
 * **`data/processed/top20_explanations.csv`**: Human-readable explanations for the Top 20 cases.
 * **`data/processed/fairness_report.csv`**: Representation ratios and average scores across demographics (17 rows).
+* **`data/processed/governed_cases.csv`**: Governed cases with both scores and new ranks (4,200 rows).
+* **`data/processed/final_top20_cases.csv`**: Governed final Top 20 prioritized cases worklist.
+* **`data/processed/final_top20_explanations.csv`**: Human-readable explanations for the governed Top 20 cases.
+* **`data/processed/final_fairness_report.csv`**: Demographic representation metrics across final Top 20 cases (17 rows).
+

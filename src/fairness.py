@@ -6,8 +6,9 @@ and group representation metrics across demographic subgroups.
 
 import pandas as pd
 import numpy as np
+import os
 
-def analyze_fairness(scored_path: str, top20_path: str = None) -> pd.DataFrame:
+def analyze_fairness(scored_path: str, top20_path: str = None, score_col: str = 'priority_score') -> pd.DataFrame:
     """
     Analyzes demographic representation between the overall population and the Top 20 prioritized cases.
     
@@ -18,6 +19,8 @@ def analyze_fairness(scored_path: str, top20_path: str = None) -> pd.DataFrame:
     top20_path : str, optional
         Path to data/processed/top20_cases.csv. If None, the Top 20 will be extracted
         directly from the head of scored_cases.csv.
+    score_col : str, optional
+        Column name to calculate the average score (default: 'priority_score')
         
     Returns:
     --------
@@ -33,7 +36,9 @@ def analyze_fairness(scored_path: str, top20_path: str = None) -> pd.DataFrame:
     if top20_path is not None and os.path.exists(top20_path):
         df_top20 = pd.read_csv(top20_path)
     else:
-        df_top20 = df_scored.head(20).copy()
+        # Sort by score_col descending
+        df_scored_sorted = df_scored.sort_values(by=[score_col, 'case_id'], ascending=[False, True]).reset_index(drop=True)
+        df_top20 = df_scored_sorted.head(20).copy()
         
     demographic_fields = ['district', 'age_band', 'language_preference', 'tenure']
     reports = []
@@ -53,7 +58,7 @@ def analyze_fairness(scored_path: str, top20_path: str = None) -> pd.DataFrame:
         t20_pcts = (t20_counts / len(df_top20)) * 100
         
         # Average priority score in overall population
-        avg_scores = df_scored.groupby(col)['priority_score'].mean()
+        avg_scores = df_scored.groupby(col)[score_col].mean()
         
         # Calculate representation ratios: top20_percentage / population_percentage
         rep_ratios = t20_pcts / pop_pcts

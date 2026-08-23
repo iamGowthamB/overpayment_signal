@@ -1,52 +1,48 @@
-# FINAL VALIDATION REPORT
+# Final Validation Report
 
-This report validates the integration and reproducibility of the analysis pipeline for **Problem 6: The Overpayment Signal**.
+This report summarizes the integration, reproducibility, and validation of the prioritization and governance pipeline for **Problem 6: The Overpayment Signal**.
 
-## Pipeline Status
+## 1. Pipeline Execution Status
 
-| Component             | Status |
-| --------------------- | ------ |
-| Dataset Understanding | PASS   |
-| EDA                   | PASS   |
-| Feature Engineering   | PASS   |
-| ML / Ranking          | PASS   |
-| Risk Scoring          | PASS   |
-| Explainability        | PASS   |
-| Fairness / Governance | PASS   |
+All 8 notebooks were executed sequentially from a fresh clone inside an isolated Python virtual environment:
 
----
-
-## Output Validation
-
-* **Number of cases**: 4,200 (Matches population size in raw datasets)
-* **Number of Top-20 cases**: 20 (Matches target priority investigation list)
-* **Explanations available**: 20/20 (All Top-20 cases have detailed, non-demographic, plain-language explanations)
-* **Fairness report generated**: Yes (Detailed counts, ratios, and box plots completed for all demographic attributes)
-* **Raw data preserved**: Yes (Raw data files `cases.csv` and `payments.csv` verified unmodified)
-* **Notebook execution**: PASS (All 7 notebooks successfully executed sequentially from start to finish with zero errors)
+| Notebook | Purpose | Status |
+| :--- | :--- | :---: |
+| **`01_data_understanding.ipynb`** | Initial profiling of raw cases and payments datasets | **PASS** |
+| **`02_eda.ipynb`** | Identification of post-closure, same-month duplicates, and excess payment patterns | **PASS** |
+| **`03_feature_engineering.ipynb`** | Building case-level aggregate features (excluding demographics) | **PASS** |
+| **`04_model_training.ipynb`** | Unsupervised Isolation Forest model training and scoring | **PASS** |
+| **`05_risk_scoring.ipynb`** | Generating deterministic case-level prioritization rankings | **PASS** |
+| **`06_explainability.ipynb`** | Generating plain-language explanations for prioritized cases | **PASS** |
+| **`07_fairness_analysis.ipynb`** | Post-hoc fairness auditing of demographic groups | **PASS** |
+| **`08_governance_adaptation.ipynb`** | Applying post-hoc administrative dampening adjustments (Surprise Challenge) | **PASS** |
 
 ---
 
-## Final Limitations
+## 2. Deliverables & Output Verification
 
-* **No Ground-Truth Target Label**: No historical verified improper-payment or fraud target labels are available in the raw data.
-* **Prioritization via Anomaly Detection**: Because the pipeline is unsupervised, the Isolation Forest model identifies statistical anomalies and payment discrepancies rather than predicting confirmed fraud.
-* **Administrative Worklist, Not Verdict**: High priority scores and rank positions flag cases for further investigation and do not constitute a determination of fraud, guilt, or improper benefit receipt.
-* **Fairness Auditing Sample Constraints**: The fairness analysis evaluates a small Top-20 sample. Minor variations of 1-2 cases can heavily fluctuate subgroup representation ratios.
-* **Human-in-the-Loop Necessity**: All final decisions regarding case reviews, administrative audits, or benefit adjustments must be performed exclusively by human investigators.
+*   **Raw Data Integrity**: Verified that `cases.csv` and `payments.csv` are preserved unmodified.
+*   **Case Populations**: All population scored files contain exactly 4,200 cases.
+*   **Original Priority Scoring**: Original priority scores (`priority_score`) are preserved for auditing.
+*   **Governed Deliverables**:
+    *   `data/processed/governed_cases.csv`: Contains 4,200 cases sorted deterministically by adjusted score (descending) and case ID (ascending) as a tie-breaker.
+    *   `data/processed/final_top20_cases.csv`: Contains the final 20 prioritized cases (all admin-only cases removed).
+    *   `data/processed/final_top20_explanations.csv`: Contains 20 plain-language explanations with zero demographic references.
+    *   `data/processed/final_fairness_report.csv`: Audits demographic representation ratios for final rankings.
 
 ---
 
-## Final Pipeline Summary
+## 3. Governance Adaptation Validation (Surprise Challenge)
 
-```
-Raw Cases + Payments
-→ Data Understanding (01_data_understanding.ipynb)
-→ EDA (02_eda.ipynb)
-→ Feature Engineering (03_feature_engineering.ipynb)
-→ Isolation Forest (04_model_training.ipynb)
-→ Priority Score (05_risk_scoring.ipynb)
-→ Top 20 (05_risk_scoring.ipynb / top20_cases.csv)
-→ Explainability (06_explainability.ipynb / top20_explanations.csv)
-→ Fairness / Governance (07_fairness_analysis.ipynb / fairness_report.csv)
-```
+*   **Dampening Strategy**: A 60% bounded administrative dampening cap was applied to administrative-only cases (no post-closure payments, no same-month duplicates, and excess payments <= $200 empirical threshold).
+*   **Case C-33248 Demotion**: Demoted from rank **485** to **1,097** (adjusted score: `0.200595`), successfully resolving the administrative false positive.
+*   **Financial Anomaly Preservation**: Verified that no genuine financial anomaly cases were removed. High-risk overpayment cases (`C-34196`, `C-33728`, and `C-30954`) successfully entered the Top 20.
+*   **Fairness Improvement**: Neutralizing the contact attempts bias dropped non-English preferred language representation in the Top 100 from 32% to 26%.
+
+---
+
+## 4. Key Limitations & Governance Principles
+
+*   **Prioritization, Not Verdict**: High priority scores and rank positions flag cases for further investigation and do not constitute a determination of fraud, guilt, or improper benefit receipt.
+*   **Human-in-the-Loop Necessity**: All final case reviews and adjustment decisions remain exclusively under human investigator purview.
+

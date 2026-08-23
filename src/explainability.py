@@ -129,3 +129,57 @@ def generate_case_explanations(df_scored: pd.DataFrame) -> pd.DataFrame:
     ]
     
     return df_sorted[output_cols]
+
+def generate_governed_case_explanations(df_gov: pd.DataFrame) -> pd.DataFrame:
+    """
+    Ranks governed cases using adjusted_priority_score, generates plain-language
+    explanations, and returns a dataframe suitable for review.
+    
+    Parameters:
+    -----------
+    df_gov : pd.DataFrame
+        DataFrame of governed cases (needs adjusted_priority_score, priority_score).
+        
+    Returns:
+    --------
+    pd.DataFrame
+        DataFrame with ranks, case IDs, scores, contributing signals, and explanations.
+    """
+    # Sort deterministically
+    df_sorted = df_gov.sort_values(by=['adjusted_priority_score', 'case_id'], ascending=[False, True]).reset_index(drop=True)
+    df_sorted['rank'] = df_sorted.index + 1
+    
+    signals_list = []
+    explanations_list = []
+    
+    for _, row in df_sorted.iterrows():
+        sig, expl = explain_case_row(row)
+        
+        # If the case is admin-only, we check if it was dampened.
+        # However, for the Top 20, none are admin-only, so this is a safety fallback.
+        if row.get('is_admin_only', False):
+            # Do not expose internal scoring math. Filter out high_contact_attempts or adjustments
+            # if they are not legitimate payment anomalies.
+            cleaned_sigs = [s for s in sig.split(' | ') if s not in ['high_contact_attempts']]
+            cleaned_expls = [e for e in expl.split(' | ') if "contact attempts" not in e]
+            if not cleaned_sigs:
+                cleaned_sigs = ['general_statistical_anomaly']
+                cleaned_expls = [f"The case exhibits a general statistical anomaly in its benefit history."]
+            sig = ' | '.join(cleaned_sigs)
+            expl = ' | '.join(cleaned_expls)
+            
+        signals_list.append(sig)
+        explanations_list.append(expl)
+        
+    df_sorted['top_contributing_signals'] = signals_list
+    df_sorted['plain_language_explanation'] = explanations_list
+    
+    output_cols = [
+        'rank', 'case_id', 'adjusted_priority_score', 'priority_score', 'status', 'monthly_award',
+        'total_payments', 'post_closure_payment_count', 'total_excess_amount',
+        'has_same_month_multi_payments', 'contact_attempts', 'months_since_review',
+        'top_contributing_signals', 'plain_language_explanation'
+    ]
+    
+    return df_sorted[output_cols]
+
